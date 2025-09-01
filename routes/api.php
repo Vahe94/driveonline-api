@@ -7,6 +7,11 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\PostController;
 
+Route::get('/', function () {
+    return view('welcome');
+});
+
+
 Route::middleware('auth:sanctum')->group(function () {
     //email verified middleware routes
     Route::middleware('verified')->group(function () {
