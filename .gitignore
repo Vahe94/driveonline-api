@@ -6,3 +6,6 @@
 /public/storage
 /storage/*.key
 /vendor
+.editorconfig
+docker-compose.yml
+Dockerfile
