@@ -14,7 +14,7 @@ class PostController extends Controller
     public function index(): JsonResponse
     {
         return response()->json(
-            Post::with(['mainPhoto', 'author'])->get()
+            Post::with('mainPhoto')->get()
         );
     }
 
