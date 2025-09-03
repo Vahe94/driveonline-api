@@ -4,22 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class EmailVerificationController extends Controller
 {
-    public function verify(EmailVerificationRequest $request): JsonResponse
+    public function verify(EmailVerificationRequest $request): Response
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email already verified'], 400);
+            return response()->noContent(400);
         }
         $request->fulfill();
-        return response()->json(['message' => 'Email verified']);
+        return response()->noContent(204);
     }
 
-    public function resend(Request $request): JsonResponse
+    public function resend(Request $request): Response
     {
         $request->user()->sendEmailVerificationNotification();
-        return response()->json(['message' => 'Verification email sent']);
+        return response()->noContent(204);
     }
 }

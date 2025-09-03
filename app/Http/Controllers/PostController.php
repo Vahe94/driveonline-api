@@ -33,7 +33,7 @@ class PostController extends Controller
 
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $file) {
-                $path = 'photos/' . $user->id . '/' . $post->id . '/';
+                $path = $user->id . '/photos/' . $post->id . '/';
                 $path = $file->store($path, 'public');
                 $photos[] = ['url' => $path];
             }
