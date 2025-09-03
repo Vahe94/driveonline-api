@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
 use App\Http\Requests\StorePostRequest;
 use Illuminate\Http\JsonResponse;
+use App\Models\Post;
 
 class PostController extends Controller
 {
@@ -13,7 +13,9 @@ class PostController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(Post::all());
+        return response()->json(
+            Post::with(['mainPhoto', 'author'])->get()
+        );
     }
 
     /**
@@ -21,11 +23,29 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request): JsonResponse
     {
-        $post = $request->user()->posts()->create(
+        $user = $request->user();
+
+        $post = $user->posts()->create(
             $request->validated()
         );
 
-        return response()->json($post, 201);
+        $photos = [];
+
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $file) {
+                $path = 'photos/' . $user->id . '/' . $post->id . '/';
+                $path = $file->store($path, 'public');
+                $photos[] = ['url' => $path];
+            }
+        }
+
+        $photos = $post->photos()->createMany($photos);
+
+        return response()->json([
+            'post' => $post,
+            'photos' => $photos,
+            'author' => $user
+        ]);
     }
 
     /**
@@ -33,7 +53,9 @@ class PostController extends Controller
      */
     public function show(Post $post): JsonResponse
     {
-        return response()->json($post);
+        return response()->json(
+            $post->load(['photos', 'author'])
+        );
     }
 
     /**

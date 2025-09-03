@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         VerifyEmail::createUrlUsing(function ($notifiable) {
-            $frontendUrl = config('app.url') . '/email/verify';
+            $frontendUrl = config('app.frontend_url') . '/email/verify';
 
             $url = URL::temporarySignedRoute(
                 'verification.verify',
