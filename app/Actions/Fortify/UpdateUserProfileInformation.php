@@ -20,7 +20,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         Validator::make($input, [
             'name' => ['nullable', 'string', 'max:255'],
             'email' => [
-                'required',
+                'sometimes',
                 'string',
                 'email',
                 'max:255',
@@ -31,7 +31,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'avatar' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
         ])->validateWithBag('updateProfileInformation');
 
-        if ($input['email'] !== $user->email) {
+        if (isset($input['email']) && $input['email'] !== $user->email) {
             $this->updateVerifiedUser($user, $input);
         } else {
             $path = null;
