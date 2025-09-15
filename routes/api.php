@@ -11,16 +11,14 @@ Route::get('/', function () {
 Route::get('posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
-//Authenticated middleware routes
 Route::middleware('auth:sanctum')->group(function () {
+    //Authenticated middleware routes
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 
-    //email verified middleware routes
     Route::middleware('verified')->group(function () {
-
-        Route::get('/user', function (Request $request) {
-            return $request->user();
-        });
-
+        //email verified middleware routes
         Route::apiResource('posts', PostController::class)->except(['index', 'show']);;
     });
 });
