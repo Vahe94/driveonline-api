@@ -10,9 +10,10 @@ class VincodeChecker extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(string $vin): JsonResponse
     {
         return response()->json([
+            'vin' => $vin,
             'Title' => 'Car one',
             'Year' => 2005
         ]);
