@@ -54,7 +54,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function avatar(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => Storage::disk('public')->url($value),
+            get: fn (?string $value) => $value ? Storage::disk('public')->url($value) : null,
         );
     }
 
