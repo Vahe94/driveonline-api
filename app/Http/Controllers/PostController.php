@@ -41,11 +41,7 @@ class PostController extends Controller
 
         $photos = $post->photos()->createMany($photos);
 
-        return response()->json([
-            'post' => $post,
-            'photos' => $photos,
-            'author' => $user
-        ]);
+        return response()->json($post->load(['photos', 'author']));
     }
 
     /**
