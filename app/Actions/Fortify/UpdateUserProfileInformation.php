@@ -17,8 +17,8 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(User $user, array $input)
     {
-        Validator::make($input, [
-            'name' => ['nullable', 'string', 'max:255'],
+        $validated = Validator::make($input, [
+            'name' => ['sometimes', 'string', 'max:255'],
             'email' => [
                 'sometimes',
                 'string',
@@ -26,24 +26,19 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
-            'phone' => ['nullable', 'regex:/^\+?[0-9]{10,15}$/'],
-            'city' => ['nullable', 'string', 'max:255'],
-            'avatar' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'phone' => ['sometimes', 'regex:/^\+?[0-9]{10,15}$/'],
+            'city' => ['sometimes', 'string', 'max:255'],
+            'avatar' => ['sometimes', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
         ])->validateWithBag('updateProfileInformation');
 
-        if (isset($input['email']) && $input['email'] !== $user->email) {
+        if (isset($validated['email']) && $validated['email'] !== $user->email) {
             $this->updateVerifiedUser($user, $input);
         } else {
-            $path = null;
-            if (!empty($input['avatar']) && $input['avatar'] instanceof UploadedFile) {
-                $path = $input['avatar']->store($user->id, 'public');
+            if (isset($validated['avatar'])) {
+                $validated['avatar'] = $validated['avatar']->store($user->id, 'public');
             }
-            $user->forceFill([
-                'name' => $input['name'] ?? null,
-                'phone' => $input['phone'] ?? null,
-                'city' => $input['city'] ?? null,
-                'avatar' => $path,
-            ])->save();
+
+            $user->forceFill($validated)->save();
         }
     }
 
