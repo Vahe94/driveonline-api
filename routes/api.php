@@ -26,6 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('user')->group(function () {
             Route::get('/posts', [UserController::class, 'getPosts']);
+            Route::get('/post/{post}', [UserController::class, 'getPost']);
             Route::apiResource('favourites', UserFavouritesController::class)->except(['update', 'show']);
         });
     });
