@@ -29,7 +29,7 @@ class AdminController extends Controller
         return response()->noContent(200);
     }
 
-    public function rejectPost(Post $post, Request $request): Response
+    public function rejectPost(Request $request, Post $post): Response
     {
         $post->status = PostStatus::REJECTED;
         $post->rejection_reason = $request->reason;
