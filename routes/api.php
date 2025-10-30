@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserFavouritesController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Middleware\Admin as AdminAuth;
+use App\Http\Controllers\FaqController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,12 +32,20 @@ Route::middleware('auth:sanctum')->group(function () {
         });
     });
 
-    Route::prefix('admin')->middleware(AdminAuth::class)->group(function () {
-        Route::get('/posts/{post}', [AdminController::class, 'getPost']);
-        Route::get('/posts/status/{status}', [AdminController::class, 'getPosts']);
-        Route::post('/posts/{post}/approve', [AdminController::class, 'approvePost']);
-        Route::post('/posts/{post}/reject', [AdminController::class, 'rejectPost']);
-    });
+    Route::prefix('admin')
+        ->middleware(AdminAuth::class)->group(function () {
+            Route::get('/posts/{post}', [AdminController::class, 'getPost']);
+            Route::get('/posts/status/{status}', [AdminController::class, 'getPosts']);
+            Route::post('/posts/{post}/approve', [AdminController::class, 'approvePost']);
+            Route::post('/posts/{post}/reject', [AdminController::class, 'rejectPost']);
+
+            Route::prefix('faq')->group(function () {
+                Route::apiResource('/', FaqController::class);
+                Route::get('/archive', [FaqController::class, 'getArchive']);
+                Route::post('/archive/{faq}', [FaqController::class, 'archive']);
+                Route::post('/restore/{faq}', [FaqController::class, 'restore']);
+            });
+        });
 });
 
 Route::post('/admin/login', [AdminController::class, 'login']);
