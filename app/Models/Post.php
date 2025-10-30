@@ -48,6 +48,6 @@ class Post extends Model
     #[Scope]
     protected function ofStatus(Builder $query, PostStatus $status): void
     {
-        $query->where('status', $status);
+        $query->where('status', $status->value);
     }
 }
