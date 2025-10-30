@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('title');
             $table->unsignedInteger('price');
             $table->text('description');
+            $table->string('status')->default('waiting');
+            $table->text('rejection_reason')->nullable();
             $table->timestamps();
         });
     }

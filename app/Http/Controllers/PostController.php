@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePostRequest;
 use Illuminate\Http\JsonResponse;
 use App\Models\Post;
+use App\Enums\PostStatus;
 
 class PostController extends Controller
 {
@@ -14,7 +15,7 @@ class PostController extends Controller
     public function index(): JsonResponse
     {
         return response()->json(
-            Post::with('mainPhoto')->get()
+            Post::ofStatus(PostStatus::APPROVED)->with('mainPhoto')->get()
         );
     }
 
@@ -47,10 +48,10 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post): JsonResponse
+    public function show(int $postId): JsonResponse
     {
         return response()->json(
-            $post->load(['photos', 'author'])
+            Post::ofStatus(PostStatus::APPROVED)->with(['photos', 'author'])->findOrFail($postId)
         );
     }
 
@@ -60,6 +61,7 @@ class PostController extends Controller
     public function update(StorePostRequest $request, Post $post)
     {
         //
+        //set status to waiting and rejection_message to null
     }
 
     /**

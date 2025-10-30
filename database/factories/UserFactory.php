@@ -23,12 +23,15 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $appName = config('app.name');
+
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $appName . ' - admin',
+            'email' => config('app.email'),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => Hash::make($appName . '_admin_password!'),
             'remember_token' => Str::random(10),
+            'is_admin' => true,
         ];
     }
 

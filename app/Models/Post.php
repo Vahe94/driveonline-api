@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Enums\PostStatus;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 class Post extends Model
 {
     protected $fillable = [
@@ -14,6 +17,18 @@ class Post extends Model
         'description',
         'user_id',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => PostStatus::class,
+        ];
+    }
 
     public function author(): BelongsTo
     {
@@ -28,5 +43,11 @@ class Post extends Model
     public function mainPhoto(): HasOne
     {
         return $this->hasOne(Photo::class)->orderBy('id');
+    }
+
+    #[Scope]
+    protected function ofStatus(Builder $query, PostStatus $status): void
+    {
+        $query->where('status', $status);
     }
 }
