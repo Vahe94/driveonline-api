@@ -34,10 +34,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('admin')
         ->middleware(AdminAuth::class)->group(function () {
-            Route::get('/posts/{post}', [AdminController::class, 'getPost']);
-            Route::get('/posts/status/{status}', [AdminController::class, 'getPosts']);
-            Route::post('/posts/{post}/approve', [AdminController::class, 'approvePost']);
-            Route::post('/posts/{post}/reject', [AdminController::class, 'rejectPost']);
+            Route::prefix('posts')->group(function () {
+                Route::get('/{post}', [AdminController::class, 'getPost']);
+                Route::get('/status/{status}', [AdminController::class, 'getPosts']);
+                Route::post('/{post}/approve', [AdminController::class, 'approvePost']);
+                Route::post('/{post}/reject', [AdminController::class, 'rejectPost']);
+            });
 
             Route::prefix('faq')->group(function () {
                 Route::apiResource('/', FaqController::class);
