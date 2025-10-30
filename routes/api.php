@@ -33,7 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('admin')->middleware(AdminAuth::class)->group(function () {
         Route::get('/posts/{post}', [AdminController::class, 'getPost']);
-        Route::get('/posts/{status}', [AdminController::class, 'getPosts']);
+        Route::get('/posts/status/{status}', [AdminController::class, 'getPosts']);
         Route::post('/posts/{post}/approve', [AdminController::class, 'approvePost']);
         Route::post('/posts/{post}/reject', [AdminController::class, 'rejectPost']);
     });
