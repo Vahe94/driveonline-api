@@ -16,6 +16,7 @@ Route::get('/', function () {
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/vincode/{vin}', VincodeChecker::class);
+Route::get('/faq', [FaqController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     //Authenticated middleware routes
