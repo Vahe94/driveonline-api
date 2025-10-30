@@ -13,8 +13,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
+Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/vincode/{vin}', VincodeChecker::class);
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -26,8 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('posts', PostController::class)->except(['index', 'show']);
 
         Route::prefix('user')->group(function () {
-            Route::get('/posts', [UserController::class, 'getPosts']);
             Route::get('/posts/{post}', [UserController::class, 'getPost']);
+            Route::get('/posts', [UserController::class, 'getPosts']);
             Route::apiResource('favourites', UserFavouritesController::class)->except(['update', 'show']);
         });
     });
@@ -35,17 +35,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('admin')
         ->middleware(AdminAuth::class)->group(function () {
             Route::prefix('posts')->group(function () {
-                Route::get('/{post}', [AdminController::class, 'getPost']);
                 Route::get('/status/{status}', [AdminController::class, 'getPosts']);
                 Route::post('/{post}/approve', [AdminController::class, 'approvePost']);
                 Route::post('/{post}/reject', [AdminController::class, 'rejectPost']);
+                Route::get('/{post}', [AdminController::class, 'getPost']);
             });
 
             Route::prefix('faq')->group(function () {
-                Route::apiResource('/', FaqController::class);
-                Route::get('/archive', [FaqController::class, 'getArchive']);
                 Route::post('/archive/{faq}', [FaqController::class, 'archive']);
                 Route::post('/restore/{faq}', [FaqController::class, 'restore']);
+                Route::get('/archive', [FaqController::class, 'getArchive']);
+                Route::apiResource('/', FaqController::class);
             });
         });
 });
