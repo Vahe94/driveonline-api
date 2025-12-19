@@ -34,5 +34,5 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'gibdd_api_key' => env('GIBDD_API_KEY', '')
 ];
