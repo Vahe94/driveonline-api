@@ -8,6 +8,7 @@ use App\Http\Controllers\UserFavouritesController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Middleware\Admin as AdminAuth;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\NewsController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -17,6 +18,8 @@ Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show')
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/vincode/{vin}', VincodeChecker::class);
 Route::get('/faq', [FaqController::class, 'index']);
+Route::get('/news/{news}', [NewsController::class, 'show']);
+Route::get('/news', [NewsController::class, 'getPublished']);
 
 Route::middleware('auth:sanctum')->group(function () {
     //Authenticated middleware routes
@@ -33,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
         });
     });
 
+    //Admin routes
     Route::prefix('admin')
         ->middleware(AdminAuth::class)->group(function () {
             Route::prefix('posts')->group(function () {
@@ -47,6 +51,13 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::post('/restore/{faq}', [FaqController::class, 'restore']);
                 Route::get('/archive', [FaqController::class, 'getArchive']);
                 Route::apiResource('/', FaqController::class);
+            });
+
+            Route::prefix('news')->group(function () {
+                Route::get('/', [NewsController::class, 'index']);
+                Route::post('/', [NewsController::class, 'store']);
+                Route::post('/{news}/publish', [NewsController::class, 'publish']);
+                Route::post('/{news}/unpublish', [NewsController::class, 'unpublish']);
             });
         });
 });
