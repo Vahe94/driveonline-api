@@ -46,7 +46,7 @@ class PostController extends Controller
             'body_type' => $request['body_type'],
             'mileage_amount' => $request['mileage']['amount'],
             'mileage_unit' => $request['mileage']['unit'],
-            'engine_capacity' => $request['engine']['volume'],
+            'engine_capacity' => $request['engine']['volume'] ?? null,
             'fuel_type' => $request['engine']['fuel_type'],
             'power' => $request['engine']['hp'],
         ]);
