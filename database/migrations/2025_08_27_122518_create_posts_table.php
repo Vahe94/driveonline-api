@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedInteger('price');
             $table->string('status')->default(PostStatus::WAITING);
             $table->text('rejection_reason')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

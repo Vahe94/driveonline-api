@@ -6,6 +6,7 @@ use App\Http\Requests\StorePostRequest;
 use Illuminate\Http\JsonResponse;
 use App\Models\Post;
 use App\Enums\PostStatus;
+use Illuminate\Http\Response;
 
 class PostController extends Controller
 {
@@ -85,6 +86,12 @@ class PostController extends Controller
     {
         //
         //set status to waiting and rejection_message to null
+    }
+
+    public function archive(Post $post): Response
+    {
+        $post->delete();
+        return response()->noContent(200);
     }
 
     /**
