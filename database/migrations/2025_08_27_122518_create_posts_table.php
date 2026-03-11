@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Enums\PostStatus;
 
 return new class extends Migration
 {
@@ -16,8 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->unsignedInteger('price');
-            $table->text('description');
-            $table->string('status')->default('waiting');
+            $table->string('status')->default(PostStatus::WAITING);
             $table->text('rejection_reason')->nullable();
             $table->timestamps();
         });

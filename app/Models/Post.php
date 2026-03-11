@@ -9,13 +9,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Enums\PostStatus;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+
 class Post extends Model
 {
     protected $fillable = [
+        'user_id',
         'title',
         'price',
-        'description',
-        'user_id',
     ];
 
     /**
@@ -49,5 +49,10 @@ class Post extends Model
     protected function ofStatus(Builder $query, PostStatus $status): void
     {
         $query->where('status', $status->value);
+    }
+
+    public function details(): HasOne
+    {
+        return $this->hasOne(VehicleDetails::class);
     }
 }

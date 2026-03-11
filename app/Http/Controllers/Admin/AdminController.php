@@ -14,12 +14,12 @@ class AdminController extends Controller
 {
     public function getPost(Post $post): JsonResponse
     {
-        return response()->json($post->load(['photos', 'author']));
+        return response()->json($post->load(['photos', 'author', 'details']));
     }
 
     public function getPosts(PostStatus $status): JsonResponse
     {
-        return response()->json(Post::ofStatus($status)->get());
+        return response()->json(Post::ofStatus($status)->with('mainPhoto')->get());
     }
 
     public function approvePost(Post $post): Response

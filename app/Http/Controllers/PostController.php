@@ -26,9 +26,30 @@ class PostController extends Controller
     {
         $user = $request->user();
 
+        $request = $request->all();
+
         $post = $user->posts()->create(
-            $request->validated()
+            [
+                'title' => $request['title'],
+                'price' => $request['price'],
+            ]
         );
+
+        $post->details()->create([
+            'description' => $request['description'],
+            'year' => $request['year'],
+            'color' => $request['color'],
+            'wheel_position' => $request['wheel_position'],
+            'condition' => $request['condition'],
+            'transmission' => $request['transmission'],
+            'drive_type' => $request['drive_type'],
+            'body_type' => $request['body_type'],
+            'mileage_amount' => $request['mileage']['amount'],
+            'mileage_unit' => $request['mileage']['unit'],
+            'engine_capacity' => $request['engine']['volume'],
+            'fuel_type' => $request['engine']['fuel_type'],
+            'power' => $request['engine']['hp'],
+        ]);
 
         $photos = [];
 
@@ -40,7 +61,9 @@ class PostController extends Controller
             }
         }
 
-        $photos = $post->photos()->createMany($photos);
+        if (!empty($photos)) {
+            $post->photos()->createMany($photos);
+        }
 
         return response()->json($post->load(['photos', 'author']));
     }
@@ -51,7 +74,7 @@ class PostController extends Controller
     public function show(int $postId): JsonResponse
     {
         return response()->json(
-            Post::ofStatus(PostStatus::APPROVED)->with(['photos', 'author'])->findOrFail($postId)
+            Post::ofStatus(PostStatus::APPROVED)->with(['photos', 'author', 'details'])->findOrFail($postId)
         );
     }
 
