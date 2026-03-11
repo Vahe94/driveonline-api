@@ -19,6 +19,6 @@ class UserController extends Controller
 
     public function getPost(Request $request, int $postId): JsonResponse
     {
-        return response()->json($request->user()->posts()->findOrFail($postId));
+        return response()->json($request->user()->posts()->with('details')->findOrFail($postId));
     }
 }
