@@ -30,6 +30,8 @@ class CreateNewUser implements CreatesNewUsers
                 'max:255',
                 Rule::unique(User::class),
             ],
+            'privacy_policy_accepted' => ['accepted'],
+            'terms_accepted' => ['accepted'],
             'password' => $this->passwordRules(),
         ])->validate();
 
@@ -37,6 +39,7 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $input['name'] ?? null,
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
+            'marketing_consent' => $input['marketing_consent'] === true,
         ]);
     }
 }
