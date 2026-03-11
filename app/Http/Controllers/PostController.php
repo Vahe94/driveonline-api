@@ -36,7 +36,7 @@ class PostController extends Controller
             ]
         );
 
-        $post->details()->create(json_decode($request['details'], true));
+        $post->details()->create($request['details']);
 
         $photos = [];
 
