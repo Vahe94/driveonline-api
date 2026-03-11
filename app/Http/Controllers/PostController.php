@@ -61,7 +61,7 @@ class PostController extends Controller
     public function show(int $postId): JsonResponse
     {
         return response()->json(
-            Post::ofStatus(PostStatus::APPROVED)->with(['photos', 'author', 'details'])->findOrFail($postId)
+            Post::with(['photos', 'author', 'details'])->findOrFail($postId)
         );
     }
 
