@@ -10,6 +10,8 @@ class VehicleDetails extends Model
 {
     protected $guarded = ['id'];
 
+    public $timestamps = false;
+
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class, 'post_id', 'id');
