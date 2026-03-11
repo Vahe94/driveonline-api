@@ -28,12 +28,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('verified')->group(function () {
         //email verified middleware routes
         Route::apiResource('posts', PostController::class)->except(['index', 'show']);
-        Route::post('/posts/{post}/archive', [PostController::class, 'archive']);
 
         Route::prefix('user')->group(function () {
             Route::get('/posts/{post}', [UserController::class, 'getPost']);
             Route::get('/posts', [UserController::class, 'getPosts']);
             Route::apiResource('favourites', UserFavouritesController::class)->except(['update', 'show']);
+            Route::get('archive', [UserController::class, 'getArchivedPosts']);
         });
     });
 

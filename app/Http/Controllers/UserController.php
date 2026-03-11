@@ -21,4 +21,9 @@ class UserController extends Controller
     {
         return response()->json($request->user()->posts()->with('details')->findOrFail($postId));
     }
+
+    public function getArchivedPosts(Request $request): JsonResponse
+    {
+        return response()->json($request->user()->posts()->onlyTrashed()->get());
+    }
 }
