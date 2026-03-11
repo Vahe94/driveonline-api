@@ -36,21 +36,7 @@ class PostController extends Controller
             ]
         );
 
-        $post->details()->create([
-            'description' => $request['description'],
-            'year' => $request['year'],
-            'color' => $request['color'],
-            'wheel_position' => $request['wheel_position'],
-            'condition' => $request['condition'],
-            'transmission' => $request['transmission'],
-            'drive_type' => $request['drive_type'],
-            'body_type' => $request['body_type'],
-            'mileage_amount' => $request['mileage']['amount'],
-            'mileage_unit' => $request['mileage']['unit'],
-            'engine_capacity' => $request['engine']['volume'] ?? null,
-            'fuel_type' => $request['engine']['fuel_type'],
-            'power' => $request['engine']['hp'],
-        ]);
+        $post->details()->create(json_decode($request['details'], true));
 
         $photos = [];
 
