@@ -62,7 +62,7 @@ class PostController extends Controller
     public function show(int $postId): JsonResponse
     {
         return response()->json(
-            Post::withTrashed()::with(['photos', 'author', 'details'])->findOrFail($postId)
+            Post::withTrashed()->with(['photos', 'author', 'details'])->findOrFail($postId)
         );
     }
 
@@ -73,6 +73,7 @@ class PostController extends Controller
     {
         $post = Post::withTrashed()->findOrFail($postId);
         $data = $request->all();
+
         if (!$post->trashed()) {
             $data['status'] = PostStatus::WAITING;
             $data['rejection_reason'] = null;
@@ -91,6 +92,11 @@ class PostController extends Controller
     public function restore(int $postId): Response
     {
         $post = Post::withTrashed()->findOrFail($postId);
+
+        $data['status'] = PostStatus::WAITING;
+        $data['rejection_reason'] = null;
+        $post->update($data);
+
         $post->restore();
         return response()->noContent(200);
     }
