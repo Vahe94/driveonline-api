@@ -6,6 +6,7 @@ use App\Http\Requests\StorePostRequest;
 use Illuminate\Http\JsonResponse;
 use App\Models\Post;
 use App\Enums\PostStatus;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class PostController extends Controller
@@ -58,20 +59,24 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $postId): JsonResponse
+    public function show(Post $post): JsonResponse
     {
         return response()->json(
-            Post::with(['photos', 'author', 'details'])->findOrFail($postId)
+            $post->load(['photos', 'author', 'details'])
         );
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(StorePostRequest $request, Post $post)
+    public function update(Request $request, Post $post): Response
     {
-        //
-        //set status to waiting and rejection_message to null
+        $data = $request->all();
+        $data['status'] = PostStatus::WAITING;
+        $data['rejection_reason'] = null;
+
+        $post->update($data);
+        return response()->noContent(200);
     }
 
     public function archive(Post $post): Response
@@ -80,11 +85,18 @@ class PostController extends Controller
         return response()->noContent(200);
     }
 
+    public function restore(Post $post): Response
+    {
+        $post->restore();
+        return response()->noContent(200);
+    }
+
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy(Post $post): Response
     {
-        //
+        $post->forceDelete();
+        return response()->noContent(200);
     }
 }

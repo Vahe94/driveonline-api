@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
         //email verified middleware routes
         Route::apiResource('posts', PostController::class)->except(['index', 'show']);
         Route::post('posts/{post}/archive', [PostController::class, 'archive']);
+        Route::post('posts/{post}/restore', [PostController::class, 'restore']);
 
         Route::prefix('user')->group(function () {
             Route::get('/posts/{post}', [UserController::class, 'getPost']);
