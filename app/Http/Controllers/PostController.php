@@ -59,48 +59,48 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Post $post): JsonResponse
+    public function show(int $postId): JsonResponse
     {
         return response()->json(
-            $post->load(['photos', 'author', 'details'])
+            Post::withTrashed()::with(['photos', 'author', 'details'])->findOrFail($postId)
         );
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Post $post): Response
+    public function update(Request $request, int $postId): Response
     {
+        $post = Post::withTrashed()->findOrFail($postId);
         $data = $request->all();
-        $data['status'] = PostStatus::WAITING;
-        $data['rejection_reason'] = null;
+        if (!$post->trashed()) {
+            $data['status'] = PostStatus::WAITING;
+            $data['rejection_reason'] = null;
+        }
 
         $post->update($data);
         return response()->noContent(200);
     }
 
-    public function archive(Request $request, Post $post): Response
+    public function archive(Post $post): Response
     {
         $post->delete();
         return response()->noContent(200);
     }
 
-    public function restore(Request $request, Post $post): Response
+    public function restore(int $postId): Response
     {
+        $post = Post::withTrashed()->findOrFail($postId);
         $post->restore();
-
-        $data['status'] = PostStatus::WAITING;
-        $data['rejection_reason'] = null;
-        $post->update($data);
-
         return response()->noContent(200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Post $post): Response
+    public function destroy(int $postId): Response
     {
+        $post = Post::withTrashed()->findOrFail($postId);
         $post->forceDelete();
         return response()->noContent(200);
     }

@@ -32,7 +32,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('posts/{post}/restore', [PostController::class, 'restore']);
 
         Route::prefix('user')->group(function () {
-            Route::get('/posts/{post}', [UserController::class, 'getPost']);
             Route::get('/posts', [UserController::class, 'getPosts']);
             Route::apiResource('favourites', UserFavouritesController::class)->except(['update', 'show']);
             Route::get('archive', [UserController::class, 'getArchivedPosts']);
