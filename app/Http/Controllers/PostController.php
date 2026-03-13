@@ -59,7 +59,7 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post): JsonResponse
+    public function show(Request $request, Post $post): JsonResponse
     {
         return response()->json(
             $post->load(['photos', 'author', 'details'])
@@ -79,22 +79,27 @@ class PostController extends Controller
         return response()->noContent(200);
     }
 
-    public function archive(Post $post): Response
+    public function archive(Request $request, Post $post): Response
     {
         $post->delete();
         return response()->noContent(200);
     }
 
-    public function restore(Post $post): Response
+    public function restore(Request $request, Post $post): Response
     {
         $post->restore();
+
+        $data['status'] = PostStatus::WAITING;
+        $data['rejection_reason'] = null;
+        $post->update($data);
+
         return response()->noContent(200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post): Response
+    public function destroy(Request $request, Post $post): Response
     {
         $post->forceDelete();
         return response()->noContent(200);
