@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('title');
+            $table->string('title')->fulltext();
             $table->unsignedInteger('price');
             $table->string('status')->default(PostStatus::WAITING);
             $table->text('rejection_reason')->nullable();
