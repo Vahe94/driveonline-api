@@ -85,7 +85,7 @@ class PostController extends Controller
             $photos = [];
 
             foreach ($request['photos'] as $file) {
-                $path = $user->id . '/photos/' . $post->id . '/';
+                $path = $user->id . '/photos/' . $post->id;
                 $path = $file->store($path, 'public');
                 $photos[] = ['url' => $path];
             }
