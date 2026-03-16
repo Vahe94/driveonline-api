@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Enums\PostStatus;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class Post extends Model
 {
@@ -18,6 +19,7 @@ class Post extends Model
         'user_id',
         'title',
         'price',
+        'payed'
     ];
 
     /**
@@ -29,6 +31,7 @@ class Post extends Model
     {
         return [
             'status' => PostStatus::class,
+            'payed' => 'boolean',
         ];
     }
 

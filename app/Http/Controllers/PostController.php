@@ -8,7 +8,7 @@ use App\Models\Post;
 use App\Enums\PostStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 
 class PostController extends Controller
 {
@@ -18,45 +18,47 @@ class PostController extends Controller
     public function index(Request $request): JsonResponse
     {
         $posts = Post::ofStatus(PostStatus::APPROVED)
-            ->when($request->has('title'), function (Builder $query, Request $request) {
-                $query->whereFullText('title', $request->title);
+            ->when($request->title, function (Builder $query, string $title) {
+                $query->whereFullText('title', $title);
             })
-            ->when($request->has('price'), function (Builder $query, Request $request) {
-                $query->whereBetween('price', [$request->price['min'], $request->price['max']]);
+            ->when($request->price, function (Builder $query, array $price) {
+                $query->whereBetween('price', [$price['min'], $price['max']]);
             })
-            ->when($request->has('year'), function (Builder $query, Request $request) {
-                $query->whereBetween('year', [$request->year['min'], $request->year['max']]);
-            })
-            ->when($request->has('color'), function (Builder $query, Request $request) {
-                $query->where('color', $request->color);
-            })
-            ->when($request->has('wheel_position'), function (Builder $query, Request $request) {
-                $query->where('wheel_position', $request->wheel_position);
-            })
-            ->when($request->has('condition'), function (Builder $query, Request $request) {
-                $query->where('condition', $request->condition);
-            })
-            ->when($request->has('transmission'), function (Builder $query, Request $request) {
-                $query->where('transmission', $request->transmission);
-            })
-            ->when($request->has('drive_type'), function (Builder $query, Request $request) {
-                $query->where('drive_type', $request->drive_type);
-            })
-            ->when($request->has('body_type'), function (Builder $query, Request $request) {
-                $query->where('body_type', $request->body_type);
-            })
-            ->when($request->has('mileage'), function (Builder $query, Request $request) {
-                $query->whereBetween('mileage_amount', $request->mileage['min'], $request->mileage['max']);
-                $query->where('mileage_unit', $request->mileage['unit']);
-            })
-            ->when($request->has('engine_capacity'), function (Builder $query, Request $request) {
-                $query->whereBetween('engine_capacity', $request->engine_capacity['min'], $request->engine_capacity['max']);
-            })
-            ->when($request->has('fuel_type'), function (Builder $query, Request $request) {
-                $query->where('fuel_type', $request->fuel_type);
-            })
-            ->when($request->has('power'), function (Builder $query, Request $request) {
-                $query->whereBetween('power', $request->power['min'], $request->power['max']);
+            ->whereHas('details', function (Builder $query) use ($request) {
+                $query->when($request->year, function (Builder $query, array $year) {
+                    $query->whereBetween('year', [$year['min'], $year['max']]);
+                })
+                ->when($request->color, function (Builder $query, string $color) {
+                    $query->where('color', $color);
+                })
+                ->when($request->wheel_position, function (Builder $query, string $wheel_position) {
+                    $query->where('wheel_position', $wheel_position);
+                })
+                ->when($request->condition, function (Builder $query, string $condition) {
+                    $query->where('condition', $condition);
+                })
+                ->when($request->transmission, function (Builder $query, string $transmission) {
+                    $query->where('transmission', $transmission);
+                })
+                ->when($request->drive_type, function (Builder $query, string $drive_type) {
+                    $query->where('drive_type', $drive_type);
+                })
+                ->when($request->body_type, function (Builder $query, string $body_type) {
+                    $query->where('body_type', $body_type);
+                })
+                ->when($request->mileage, function (Builder $query, array $mileage) {
+                    $query->whereBetween('mileage_amount', [$mileage['min'], $mileage['max']]);
+                    $query->where('mileage_unit', $mileage['unit']);
+                })
+                ->when($request->engine_capacity, function (Builder $query, array $engine_capacity) {
+                    $query->whereBetween('engine_capacity', [$engine_capacity['min'], $engine_capacity['max']]);
+                })
+                ->when($request->fuel_type, function (Builder $query, string $fuel_type) {
+                    $query->where('fuel_type', $fuel_type);
+                })
+                ->when($request->power, function (Builder $query, array $power) {
+                    $query->whereBetween('power', [$power['min'], $power['max']]);
+                });
             })
         ->with('mainPhoto')
         ->get();
@@ -73,26 +75,21 @@ class PostController extends Controller
 
         $request = $request->all();
 
-        $post = $user->posts()->create(
-            [
-                'title' => $request['title'],
-                'price' => $request['price'],
-            ]
-        );
+        $post = $user->posts()->create($request);
 
         $post->details()->create($request['details']);
 
-        $photos = [];
+
 
         if (isset($request['photos'])) {
+            $photos = [];
+
             foreach ($request['photos'] as $file) {
                 $path = $user->id . '/photos/' . $post->id . '/';
                 $path = $file->store($path, 'public');
                 $photos[] = ['url' => $path];
             }
-        }
 
-        if (!empty($photos)) {
             $post->photos()->createMany($photos);
         }
 

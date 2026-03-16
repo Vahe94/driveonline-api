@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('rejection_reason')->nullable();
             $table->softDeletes();
             $table->timestamps();
+            $table->boolean('payed')->default(false);
         });
     }
 

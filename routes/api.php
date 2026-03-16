@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\VincodeChecker;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserFavouritesController;
 use App\Http\Controllers\Admin\AdminController;
@@ -16,7 +15,7 @@ Route::get('/', function () {
 
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
-Route::get('/vincode/{vin}', VincodeChecker::class);
+Route::get('/vincode/{vin}', [UserController::class, 'checkVin']);
 Route::get('/faq', [FaqController::class, 'index']);
 Route::get('/news/{news}', [NewsController::class, 'show']);
 Route::get('/news', [NewsController::class, 'getPublished']);
