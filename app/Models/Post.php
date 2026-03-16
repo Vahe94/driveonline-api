@@ -19,7 +19,9 @@ class Post extends Model
         'user_id',
         'title',
         'price',
-        'payed'
+        'payed',
+        'status',
+        'rejection_reason',
     ];
 
     /**

@@ -115,7 +115,7 @@ class PostController extends Controller
         $data = $request->all();
 
         if (!$post->trashed() || !isset($data['payed'])) {
-            $data['status'] = PostStatus::WAITING;
+            $data['status'] = PostStatus::WAITING->value;
             $data['rejection_reason'] = null;
         }
 
@@ -138,7 +138,7 @@ class PostController extends Controller
     {
         $post = Post::withTrashed()->findOrFail($postId);
 
-        $data['status'] = PostStatus::WAITING;
+        $data['status'] = PostStatus::WAITING->value;
         $data['rejection_reason'] = null;
         $post->update($data);
 
