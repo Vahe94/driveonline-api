@@ -1,15 +1,4 @@
-FROM composer:2 AS vendor
-
-WORKDIR /app
-
-COPY composer.json composer.lock ./
-
-RUN composer install \
-    --no-dev \
-    --prefer-dist \
-    --no-interaction \
-    --optimize-autoloader \
-    --no-scripts
+FROM composer:2.8-php8.4 AS composer_bin
 
 FROM php:8.4-apache
 
@@ -35,8 +24,16 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /var/www/html
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-COPY --from=vendor /app/vendor ./vendor
+COPY --from=composer_bin /usr/bin/composer /usr/bin/composer
+COPY composer.json composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --prefer-dist \
+    --no-interaction \
+    --optimize-autoloader \
+    --no-scripts
+
 COPY . .
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint
 
