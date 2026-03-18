@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Support\Facades\Storage;
 
 class Photo extends Model
 {
@@ -14,7 +13,7 @@ class Photo extends Model
     protected function url(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => Storage::disk('public')->url($value),
+            get: fn (string $value) => url('media/' . preg_replace('#/+#', '/', ltrim($value, '/'))),
         );
     }
 }
