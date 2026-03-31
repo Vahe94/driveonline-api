@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
@@ -34,6 +35,15 @@ class AppServiceProvider extends ServiceProvider
             );
 
             return $frontendUrl . '?url=' . urlencode($url);
+        });
+
+        VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
+            return (new MailMessage)
+                ->subject('Подтверждение адреса электронной почты')
+                ->theme('driveonline')
+                ->markdown('emails.verify-email', [
+                    'actionUrl' => $url,
+                ]);
         });
     }
 }
