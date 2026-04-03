@@ -6,9 +6,16 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
 
     steps:
       - name: Deploy over SSH
@@ -18,30 +25,64 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
+          fingerprint: ${{ secrets.DEPLOY_HOST_FINGERPRINT }}
+          command_timeout: 30m
           script: |
-            set -e
-            mkdir -p /opt/driveonline/driveonline-next
-            mkdir -p /opt/driveonline/driveonline-api
+            set -euo pipefail
 
-            cat > /opt/driveonline/driveonline-next/.env.production <<'EOF'
+            PROJECT_ROOT=/opt/driveonline
+            FRONTEND_DIR="$PROJECT_ROOT/driveonline-next"
+            BACKEND_DIR="$PROJECT_ROOT/driveonline-api"
+            DEPLOY_BRANCH=main
+            FRONTEND_REPO=git@github.com:Vahe94/driveonline-next.git
+            BACKEND_REPO=git@github.com:Vahe94/driveonline-api.git
+            GITHUB_KEY_PATH=/tmp/driveonline-github-deploy-key
+            LOCK_FILE=/tmp/driveonline-production-deploy.lock
+
+            install -m 700 -d "$PROJECT_ROOT"
+            exec 9>"$LOCK_FILE"
+            flock -n 9 || {
+              echo "Another deployment is already running."
+              exit 1
+            }
+            trap 'rm -f "$GITHUB_KEY_PATH"' EXIT
+
+            cat > "$GITHUB_KEY_PATH" <<'EOF'
+            ${{ secrets.REPO_READ_SSH_KEY }}
+            EOF
+            chmod 600 "$GITHUB_KEY_PATH"
+            export GIT_SSH_COMMAND="ssh -i $GITHUB_KEY_PATH -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+
+            if [ ! -d "$FRONTEND_DIR/.git" ]; then
+              git clone "$FRONTEND_REPO" "$FRONTEND_DIR"
+            fi
+
+            if [ ! -d "$BACKEND_DIR/.git" ]; then
+              git clone "$BACKEND_REPO" "$BACKEND_DIR"
+            fi
+
+            cat > "$FRONTEND_DIR/.env.production" <<'EOF'
             ${{ secrets.FRONTEND_ENV_PRODUCTION }}
             EOF
+            chmod 600 "$FRONTEND_DIR/.env.production"
 
-            cat > /opt/driveonline/driveonline-api/.env.production <<'EOF'
+            cat > "$BACKEND_DIR/.env.production" <<'EOF'
             ${{ secrets.BACKEND_ENV_PRODUCTION }}
             EOF
+            chmod 600 "$BACKEND_DIR/.env.production"
 
-            cd /opt/driveonline/driveonline-next
+            cd "$FRONTEND_DIR"
             git fetch --all
-            git checkout main
-            git pull origin main
+            git checkout "$DEPLOY_BRANCH"
+            git pull --ff-only origin "$DEPLOY_BRANCH"
 
-            cd /opt/driveonline/driveonline-api
+            cd "$BACKEND_DIR"
             git fetch --all
-            git checkout main
-            git pull origin main
+            git checkout "$DEPLOY_BRANCH"
+            git pull --ff-only origin "$DEPLOY_BRANCH"
 
-            cd /opt/driveonline/driveonline-next
+            cd "$FRONTEND_DIR"
+            docker compose -f deploy/docker-compose.prod.yml config >/dev/null
             docker compose -f deploy/docker-compose.prod.yml up -d --build
             docker compose -f deploy/docker-compose.prod.yml exec -T backend php artisan migrate --force
             docker compose -f deploy/docker-compose.prod.yml exec -T backend php artisan optimize
