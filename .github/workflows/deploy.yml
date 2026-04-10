@@ -22,11 +22,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Compute image references
         id: image_meta
         run: |
           owner="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
-          echo "frontend_image=ghcr.io/${owner}/driveonline-next" >> "$GITHUB_OUTPUT"
           echo "backend_image=ghcr.io/${owner}/driveonline-api" >> "$GITHUB_OUTPUT"
 
       - name: Log in to GHCR for image push
@@ -48,13 +50,16 @@ jobs:
 
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
+        env:
+          GHCR_USERNAME: ${{ secrets.GHCR_PULL_USERNAME }}
+          GHCR_PAT: ${{ secrets.GHCR_PULL_TOKEN }}
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
-          fingerprint: ${{ secrets.DEPLOY_HOST_FINGERPRINT }}
           command_timeout: 30m
+          envs: GHCR_USERNAME,GHCR_PAT
           script: |
             set -euo pipefail
 
@@ -91,13 +96,13 @@ jobs:
             EOF
 
             {
-              echo "FRONTEND_IMAGE=${{ steps.image_meta.outputs.frontend_image }}:main"
+              echo "FRONTEND_IMAGE=ghcr.io/vahe94/driveonline-next:main"
               echo "BACKEND_IMAGE=${{ steps.image_meta.outputs.backend_image }}:main"
               echo "FRONTEND_RUNTIME_ENV_FILE=$FRONTEND_ENV_FILE"
               echo "BACKEND_RUNTIME_ENV_FILE=$BACKEND_ENV_FILE"
             } >> "$COMPOSE_ENV_FILE"
 
-            echo "${{ secrets.GHCR_PULL_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_PULL_USERNAME }}" --password-stdin
+            echo "$GHCR_PAT" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
             docker compose --env-file "$COMPOSE_ENV_FILE" -f "$DEPLOY_DIR/docker-compose.prod.yml" pull
             docker compose --env-file "$COMPOSE_ENV_FILE" -f "$DEPLOY_DIR/docker-compose.prod.yml" up -d
             docker compose --env-file "$COMPOSE_ENV_FILE" -f "$DEPLOY_DIR/docker-compose.prod.yml" exec -T backend php artisan migrate --force
