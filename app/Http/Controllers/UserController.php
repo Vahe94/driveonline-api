@@ -15,12 +15,23 @@ class UserController extends Controller
 
     public function getPosts(Request $request): JsonResponse
     {
-        return response()->json($request->user()->posts()->get());
+        return response()->json(
+            $request->user()
+                ->posts()
+                ->with(['photos', 'mainPhoto', 'details', 'author'])
+                ->get()
+        );
     }
 
     public function getArchivedPosts(Request $request): JsonResponse
     {
-        return response()->json($request->user()->posts()->onlyTrashed()->get());
+        return response()->json(
+            $request->user()
+                ->posts()
+                ->onlyTrashed()
+                ->with(['photos', 'mainPhoto', 'details', 'author'])
+                ->get()
+        );
     }
 
     public function checkVin(string $vin): JsonResponse
