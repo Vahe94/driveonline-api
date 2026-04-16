@@ -34,6 +34,7 @@ RUN composer install \
 
 COPY . .
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint
+COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
 RUN chmod +x /usr/local/bin/entrypoint \
     && mkdir -p storage/app/public \

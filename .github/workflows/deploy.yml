@@ -106,5 +106,5 @@ jobs:
             docker compose --env-file "$COMPOSE_ENV_FILE" -f "$DEPLOY_DIR/docker-compose.prod.yml" pull
             docker compose --env-file "$COMPOSE_ENV_FILE" -f "$DEPLOY_DIR/docker-compose.prod.yml" up -d
             docker compose --env-file "$COMPOSE_ENV_FILE" -f "$DEPLOY_DIR/docker-compose.prod.yml" exec -T backend php artisan migrate --force
-            docker compose --env-file "$COMPOSE_ENV_FILE" -f "$DEPLOY_DIR/docker-compose.prod.yml" exec -T backend php artisan optimize
+            docker compose --env-file "$COMPOSE_ENV_FILE" -f "$DEPLOY_DIR/docker-compose.prod.yml" exec -T backend php artisan optimize --except=views
             docker logout ghcr.io || true

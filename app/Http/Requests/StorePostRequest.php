@@ -23,8 +23,10 @@ class StorePostRequest extends FormRequest
     {
         return [
             'title'       => 'required|string|max:255',
+            'vin' => 'nullable|string|max:64',
             'price'       => 'required|integer|min:1',
-            'photos.*' => 'nullable|file|mimes:jpg,jpeg,png|max:10240',
+            'photos'       => 'nullable|array|max:10',
+            'photos.*' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:3072',
         ];
     }
 }
