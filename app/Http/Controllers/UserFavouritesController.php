@@ -14,7 +14,11 @@ class UserFavouritesController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        $favourites = $user->favourites()->get();
+        $favourites = $user->favourites()
+            ->with(['photos', 'mainPhoto', 'details', 'author'])
+            ->get()
+            ->unique('id')
+            ->values();
         return response()->json($favourites);
     }
 
@@ -24,7 +28,7 @@ class UserFavouritesController extends Controller
     public function store(Request $request): Response
     {
         $user = $request->user();
-        $user->favourites()->attach($request->post_id);
+        $user->favourites()->syncWithoutDetaching([$request->post_id]);
         return response()->noContent(201);
     }
 

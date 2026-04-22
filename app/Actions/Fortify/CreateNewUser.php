@@ -32,12 +32,16 @@ class CreateNewUser implements CreatesNewUsers
             ],
             'privacy_policy_accepted' => ['accepted'],
             'terms_accepted' => ['accepted'],
+            'phone' => ['required', 'regex:/^\+?[0-9]{10,15}$/'],
+            'city' => ['required', 'string', 'max:255'],
             'password' => $this->passwordRules(),
         ])->validate();
 
         return User::create([
             'name' => $input['name'] ?? null,
             'email' => $input['email'],
+            'phone' => $input['phone'],
+            'city' => $input['city'],
             'password' => Hash::make($input['password']),
             'marketing_consent' => $input['marketing_consent'] === true,
         ]);
