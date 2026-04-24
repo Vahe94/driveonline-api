@@ -109,7 +109,7 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $postId): Response
+    public function update(StorePostRequest $request, int $postId): Response
     {
         $post = Post::withTrashed()->findOrFail($postId);
         $data = $request->all();

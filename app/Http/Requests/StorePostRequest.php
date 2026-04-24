@@ -21,12 +21,16 @@ class StorePostRequest extends FormRequest
      */
     public function rules(): array
     {
+        $requiredRule = $this->isMethod('post') ? 'required' : 'sometimes';
+
         return [
-            'title'       => 'required|string|max:255',
-            'vin' => 'nullable|string|max:64',
-            'price'       => 'required|integer|min:1',
+            'title'       => [$requiredRule, 'string', 'max:255'],
+            'vin' => ['nullable', 'string', 'max:64'],
+            'price'       => [$requiredRule, 'integer', 'min:1'],
             'photos'       => 'nullable|array|max:10',
             'photos.*' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:3072',
+            'details' => [$requiredRule, 'array'],
+            'details.description' => [$requiredRule, 'string', 'min:10', 'max:10000'],
         ];
     }
 }
