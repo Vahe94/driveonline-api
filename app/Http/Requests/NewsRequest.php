@@ -23,9 +23,10 @@ class NewsRequest extends FormRequest
     {
         return [
             'title' => 'required|string',
+            'summary' => 'nullable|string|max:300',
             'content' => 'required|string',
-            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'published_at' => 'date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'published_at' => 'nullable|date',
         ];
     }
 }

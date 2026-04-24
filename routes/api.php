@@ -17,6 +17,7 @@ Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show')
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/vincode/{vin}', [UserController::class, 'checkVin']);
 Route::get('/faq', [FaqController::class, 'index']);
+Route::get('/news/slug/{slug}', [NewsController::class, 'showPublishedBySlug']);
 Route::get('/news/{news}', [NewsController::class, 'show']);
 Route::get('/news', [NewsController::class, 'getPublished']);
 
@@ -44,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::get('/status/{status}', [AdminController::class, 'getPosts']);
                 Route::post('/{post}/approve', [AdminController::class, 'approvePost']);
                 Route::post('/{post}/reject', [AdminController::class, 'rejectPost']);
+                Route::post('/{post}/featured', [AdminController::class, 'toggleFeaturedPost']);
                 Route::get('/{post}', [AdminController::class, 'getPost']);
             });
 
@@ -57,6 +59,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::prefix('news')->group(function () {
                 Route::get('/', [NewsController::class, 'index']);
                 Route::post('/', [NewsController::class, 'store']);
+                Route::put('/{news}', [NewsController::class, 'update']);
+                Route::delete('/{news}', [NewsController::class, 'destroy']);
                 Route::post('/{news}/publish', [NewsController::class, 'publish']);
                 Route::post('/{news}/unpublish', [NewsController::class, 'unpublish']);
             });
