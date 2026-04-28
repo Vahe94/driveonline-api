@@ -21,6 +21,11 @@ class PostController extends Controller
             ->when($request->title, function (Builder $query, string $title) {
                 $query->whereFullText('title', $title);
             })
+            ->when($request->city, function (Builder $query, string $city) {
+                $query->whereHas('author', function (Builder $authorQuery) use ($city) {
+                    $authorQuery->where('city', trim($city));
+                });
+            })
             ->when($request->price, function (Builder $query, array $price) {
                 $query->whereBetween('price', [$price['min'], $price['max']]);
             })
@@ -60,7 +65,7 @@ class PostController extends Controller
                     $query->whereBetween('power', [$power['min'], $power['max']]);
                 });
             })
-        ->with('mainPhoto')
+        ->with(['mainPhoto', 'author', 'details'])
         ->get();
 
         return response()->json($posts);
