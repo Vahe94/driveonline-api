@@ -17,6 +17,8 @@ class PostController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        $perPage = max(1, min($request->integer('per_page', 12), 48));
+
         $posts = Post::ofStatus(PostStatus::APPROVED)
             ->when($request->title, function (Builder $query, string $title) {
                 $query->whereFullText('title', $title);
@@ -66,7 +68,8 @@ class PostController extends Controller
                 });
             })
         ->with(['mainPhoto', 'author', 'details'])
-        ->get();
+        ->orderByDesc('created_at')
+        ->paginate($perPage);
 
         return response()->json($posts);
     }
