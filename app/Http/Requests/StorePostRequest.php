@@ -27,7 +27,7 @@ class StorePostRequest extends FormRequest
             'title'       => [$requiredRule, 'string', 'max:255'],
             'vin' => ['nullable', 'string', 'max:64'],
             'price'       => [$requiredRule, 'integer', 'min:1'],
-            'photos'       => 'nullable|array|max:10',
+            'photos'       => 'nullable|array|max:20',
             'photos.*' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:3072',
             'details' => [$requiredRule, 'array'],
             'details.description' => [$requiredRule, 'string', 'min:10', 'max:10000'],

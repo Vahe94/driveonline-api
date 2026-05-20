@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\PostStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Post;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Post;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 
 class AdminController extends Controller
 {
@@ -31,6 +34,7 @@ class AdminController extends Controller
     {
         $post->status = PostStatus::APPROVED;
         $post->save();
+
         return response()->noContent(200);
     }
 
@@ -39,6 +43,7 @@ class AdminController extends Controller
         $post->status = PostStatus::REJECTED;
         $post->rejection_reason = $request->reason;
         $post->save();
+
         return response()->noContent(200);
     }
 
@@ -70,5 +75,27 @@ class AdminController extends Controller
         }
 
         return response()->noContent(401);
+    }
+
+    public function updatePassword(Request $request): Response
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', Password::default(), 'confirmed'],
+        ]);
+
+        $user = $request->user();
+
+        if (! Hash::check($validated['current_password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => [__('The provided password does not match your current password.')],
+            ]);
+        }
+
+        $user->forceFill([
+            'password' => Hash::make($validated['password']),
+        ])->save();
+
+        return response()->noContent(204);
     }
 }

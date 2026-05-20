@@ -1,13 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\FaqController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserFavouritesController;
-use App\Http\Controllers\Admin\AdminController;
 use App\Http\Middleware\Admin as AdminAuth;
-use App\Http\Controllers\FaqController;
-use App\Http\Controllers\NewsController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
@@ -22,11 +22,11 @@ Route::get('/news/{news}', [NewsController::class, 'show']);
 Route::get('/news', [NewsController::class, 'getPublished']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    //Authenticated middleware routes
+    // Authenticated middleware routes
     Route::get('/user', [UserController::class, 'show']);
 
     Route::middleware('verified')->group(function () {
-        //email verified middleware routes
+        // email verified middleware routes
         Route::apiResource('posts', PostController::class)->except(['index', 'show']);
         Route::post('posts/{post}/archive', [PostController::class, 'archive']);
         Route::post('posts/{post}/restore', [PostController::class, 'restore']);
@@ -38,9 +38,11 @@ Route::middleware('auth:sanctum')->group(function () {
         });
     });
 
-    //Admin routes
+    // Admin routes
     Route::prefix('admin')
         ->middleware(AdminAuth::class)->group(function () {
+            Route::put('/password', [AdminController::class, 'updatePassword']);
+
             Route::prefix('posts')->group(function () {
                 Route::get('/status/{status}', [AdminController::class, 'getPosts']);
                 Route::post('/{post}/approve', [AdminController::class, 'approvePost']);
