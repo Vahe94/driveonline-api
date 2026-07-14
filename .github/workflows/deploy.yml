@@ -86,6 +86,12 @@ jobs:
             cat > "$FRONTEND_ENV_FILE" <<'EOF'
             ${{ secrets.FRONTEND_ENV_PRODUCTION }}
             EOF
+            cat >> "$FRONTEND_ENV_FILE" <<'EOF'
+            NEXT_PUBLIC_SITE_URL=https://рули.online
+            NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=${{ secrets.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }}
+            NEXT_PUBLIC_YANDEX_VERIFICATION=${{ secrets.NEXT_PUBLIC_YANDEX_VERIFICATION }}
+            INDEXNOW_KEY=${{ secrets.INDEXNOW_KEY }}
+            EOF
 
             cat > "$BACKEND_ENV_FILE" <<'EOF'
             ${{ secrets.BACKEND_ENV_PRODUCTION }}

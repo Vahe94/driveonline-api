@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\CarCatalogController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PostController;
@@ -17,6 +18,7 @@ Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show')
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/vincode/{vin}', [UserController::class, 'checkVin']);
 Route::get('/faq', [FaqController::class, 'index']);
+Route::get('/car-catalog', [CarCatalogController::class, 'index']);
 Route::get('/news/slug/{slug}', [NewsController::class, 'showPublishedBySlug']);
 Route::get('/news/{news}', [NewsController::class, 'show']);
 Route::get('/news', [NewsController::class, 'getPublished']);
@@ -65,6 +67,16 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::delete('/{news}', [NewsController::class, 'destroy']);
                 Route::post('/{news}/publish', [NewsController::class, 'publish']);
                 Route::post('/{news}/unpublish', [NewsController::class, 'unpublish']);
+            });
+
+            Route::prefix('car-catalog')->group(function () {
+                Route::get('/', [CarCatalogController::class, 'adminIndex']);
+                Route::post('/makes', [CarCatalogController::class, 'storeMake']);
+                Route::put('/makes/{make}', [CarCatalogController::class, 'updateMake']);
+                Route::delete('/makes/{make}', [CarCatalogController::class, 'destroyMake']);
+                Route::post('/makes/{make}/models', [CarCatalogController::class, 'storeModel']);
+                Route::put('/models/{model}', [CarCatalogController::class, 'updateModel']);
+                Route::delete('/models/{model}', [CarCatalogController::class, 'destroyModel']);
             });
         });
 });

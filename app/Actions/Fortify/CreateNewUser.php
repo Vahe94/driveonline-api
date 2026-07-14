@@ -3,10 +3,9 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use Closure;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
@@ -14,13 +13,18 @@ class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules;
 
+    private const DISALLOWED_EMAIL_DOMAINS = [
+        'gmail.com',
+        'googlemail.com',
+    ];
+
     /**
      * Validate and create a newly registered user.
      *
      * @param  array<string, string>  $input
      */
     public function create(array $input): User
-    {        
+    {
         Validator::make($input, [
             'name' => ['nullable', 'string', 'max:255'],
             'email' => [
@@ -29,6 +33,13 @@ class CreateNewUser implements CreatesNewUsers
                 'email',
                 'max:255',
                 Rule::unique(User::class),
+                function (string $attribute, mixed $value, Closure $fail): void {
+                    $domain = strtolower(substr(strrchr((string) $value, '@') ?: '', 1));
+
+                    if (in_array($domain, self::DISALLOWED_EMAIL_DOMAINS, true)) {
+                        $fail('Регистрация с Gmail недоступна. Используйте другой e-mail.');
+                    }
+                },
             ],
             'privacy_policy_accepted' => ['accepted'],
             'terms_accepted' => ['accepted'],
